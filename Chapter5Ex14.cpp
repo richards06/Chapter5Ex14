@@ -15,47 +15,53 @@ Input Validation: Do not accept a number less than 1 or greater than 25 for the 
 */
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <algorithm>
 
 using namespace std;
 
-int getNumberOfStudents() {
-    int numStudents;
-    cout << "Enter the number of students in the class (1-25): ";
-    cin >> numStudents;
+vector<string> readStudentNamesFromFile() {
+    const string filename = "LineUp.txt";
+    vector<string> studentNames;
+    ifstream inputFile(filename);
 
-    while(numStudents < 1 || numStudents>25) {
-        cout << "Invalid number of students. Please enter a value between 1 and 25: ";
-        cin >> numStudents;
+    if (!inputFile) {
+        cout << "Error: Could not open the file " << filename << endl;
+        return studentNames;
     }
-    return numStudents;
-}
 
-vector<string> getStudentNames(int numStudents) {
-    vector<string> studentNames(numStudents);
-    cout << "Enter the names of " << numStudents << " students: " << endl;
-    for (int i = 0; i < numStudents; i++) {
-        cout << "Student " << (i + 1) << ": ";
-        cin >> studentNames[i];
+    string name;
+    while (getline(inputFile, name)) {
+        if (!name.empty()) {
+            studentNames.push_back(name);
+        }
     }
+
+    inputFile.close();
     return studentNames;
 }
 
 void displayLineOrder(const vector<string>& studentNames) {
+    if (studentNames.empty()) {
+        cout << "No student names were provided." << endl;
+        return;
+    }
+
     vector<string> sortedNames = studentNames;
     sort(sortedNames.begin(), sortedNames.end());
 
-    cout << "\nThe student at the front of the live is: " << sortedNames[0] << endl;
+    cout << "\nThe student at the front of the line is: " << sortedNames[0] << endl;
     cout << "The student at the end of the line is: " << sortedNames[sortedNames.size() - 1] << endl;
 }
 
 int main()
 {
-    int numStudents = getNumberOfStudents();
-    vector<string> studentNames = getStudentNames(numStudents);
+    vector<string> studentNames = readStudentNamesFromFile();
+
     displayLineOrder(studentNames);
+    
     return 0;
 }
 
